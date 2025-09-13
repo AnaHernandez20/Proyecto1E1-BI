@@ -1,0 +1,10 @@
+Resultados del modelo de Red Neuronal en el conjunto de metricas reservado (10% de los datos):
+              precision    recall  f1-score   support
+
+           1      0.920     0.821     0.868        56
+           3      0.897     0.975     0.934        80
+           4      0.953     0.944     0.948       107
+
+    accuracy                          0.926       243
+   macro avg      0.923     0.913     0.917       243
+weighted avg      0.927     0.926     0.925       243
