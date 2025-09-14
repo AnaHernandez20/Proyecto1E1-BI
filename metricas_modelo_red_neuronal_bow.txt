@@ -1,0 +1,10 @@
+Resultados del modelo de Red Neuronal con BOW en el conjunto de métricas reservado (10% de los datos):
+              precision    recall  f1-score   support
+
+           1      1.000     0.875     0.933        56
+           3      0.899     1.000     0.947        80
+           4      0.971     0.953     0.962       107
+
+    accuracy                          0.951       243
+   macro avg      0.957     0.943     0.947       243
+weighted avg      0.954     0.951     0.950       243
