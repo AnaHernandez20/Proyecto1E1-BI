@@ -7,7 +7,12 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.base import BaseEstimator, TransformerMixin
 import joblib
 import pandas as pd
-from preprocesamiento import preprocesar_texto
+
+#Para no fallar al importar la función preprocesar_texto, probamos dos formas de importarla porque puede variar según desde dónde se ejecute el script
+try:
+    from .preprocesamiento import preprocesar_texto
+except ImportError:
+    from src.preprocesamiento import preprocesar_texto
 
 
 #Le aplicamos el preprocesamiento a cada uno de los textos antes de hacerle tf-idf

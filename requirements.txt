@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+pandas
+scikit-learn
+spacy
+joblib
+openpyxl
+nltk
+num2words
