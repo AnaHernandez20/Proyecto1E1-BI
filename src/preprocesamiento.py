@@ -59,8 +59,8 @@ def reemplazar_numeros_token(token: str):
 
 # 4) Tokenización: dividimos las frases o las oraciones en tokens (palabras) y las limpiamos 
 def tokenizar(texto):
-    #Usamos la función word_tokenize de nltk para tokenizar el texto
-    return word_tokenize(texto, language='spanish')
+    #Dividimos el texto por espacios, sin usar NLTK
+    return texto.split()
 
 #Limpiamos los tokens con las funciones anteriores
 def limpiar_tokens(tokens):
