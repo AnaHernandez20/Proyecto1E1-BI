@@ -8,11 +8,15 @@ from sklearn.base import BaseEstimator, TransformerMixin
 import joblib
 import pandas as pd
 
-#Para no fallar al importar la función preprocesar_texto, probamos dos formas de importarla porque puede variar según desde dónde se ejecute el script
-try:
-    from .preprocesamiento import preprocesar_texto
-except ImportError:
-    from src.preprocesamiento import preprocesar_texto
+#Para poder importar desde la carpeta src (que está fuera de la carpeta src que es donde está este archivo pipeline_ods.py)
+import os, sys
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))      # .../Proyecto1E1-BI/src
+ROOT_DIR = os.path.abspath(os.path.join(BASE_DIR, '..'))   # .../Proyecto1E1-BI
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
+
+#Para no fallar al importar la función preprocesar_texto
+from src.preprocesamiento import preprocesar_texto
 
 
 #Le aplicamos el preprocesamiento a cada uno de los textos antes de hacerle tf-idf
