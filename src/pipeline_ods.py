@@ -72,7 +72,7 @@ df = pd.read_excel("data/Datos_proyecto.xlsx")
 X = df["textos"].astype(str).tolist() #Aqui estamos haciendo astype(str) para asegurarnos de que todos los textos sean strings
 y = df["labels"].tolist()
 
-entrenamiento_df = pd.DataFrame({'textos': X, 'Label': y})
+entrenamiento_df = pd.DataFrame({'textos': X, 'labels': y})
 
 #Creamos el pipeline
 pipeline = creacion_del_pipeline()
@@ -91,7 +91,7 @@ joblib.dump(pipeline, model_path)
 #Esto quiere decir que el modelo del pipeline ya está listo para usarse (ya lo hemos entrenado y guardado)
 
 #Guardamos el dataset original de entrenamiento para poder reentrenar el modelo en el futuro si es necesario
-entrenamiento_df = pd.DataFrame({'textos': X, 'Label': y})
+entrenamiento_df = pd.DataFrame({'textos': X, 'labels': y})
 entrenamiento_df.to_csv('data/training_data.csv', index=False)
 
 #Quedo guardado como training_data.csv en la carpeta data
