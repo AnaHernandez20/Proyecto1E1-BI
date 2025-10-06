@@ -66,40 +66,43 @@ def creacion_del_pipeline() -> Pipeline:
     ])
     return pipeline
 
+#Ahora si entrenamos el pipeline completo con los datos de la etapa 1 del proyecto
+#Ponemos main para que solo se ejecute si corremos este archivo directamente, y no si lo importamos desde otro archivo
+#Esto es para que no se ejecute el entrenamiento del modelo con los datos de la etapa 1 si solo queremos importar la función creacion_del_pipeline desde otro archivo para otros propósitos
+if __name__ == "__main__":
+    #Cargamos los datos de la etapa 1 del proyecto
+    #Recordemos que tienen las columnas: 'texto', 'etiqueta'
+    df = pd.read_excel("data/Datos_proyecto.xlsx")
 
-#Cargamos los datos de la etapa 1 del proyecto
-#Recordemos que tienen las columnas: 'texto', 'etiqueta'
-df = pd.read_excel("data/Datos_proyecto.xlsx")
+    #Separemos en x y y que son las variables que usaremos para entrenar el modelo
+    #X es la columna "texto" y y es la columna "etiqueta"
+    X = df["textos"].astype(str).tolist() #Aqui estamos haciendo astype(str) para asegurarnos de que todos los textos sean strings
+    y = df["labels"].tolist()
 
-#Separemos en x y y que son las variables que usaremos para entrenar el modelo
-#X es la columna "texto" y y es la columna "etiqueta"
-X = df["textos"].astype(str).tolist() #Aqui estamos haciendo astype(str) para asegurarnos de que todos los textos sean strings
-y = df["labels"].tolist()
+    entrenamiento_df = pd.DataFrame({'textos': X, 'labels': y})
 
-entrenamiento_df = pd.DataFrame({'textos': X, 'labels': y})
+    #Creamos el pipeline
+    pipeline = creacion_del_pipeline()
 
-#Creamos el pipeline
-pipeline = creacion_del_pipeline()
+    #Entrenamos el pipeline con X y y
+    #Esto hace todo el flujo completo, es decir, hace preprocesamiento, tf-idf y entrenamiento del modelo de Regresión Logística
+    pipeline.fit(X, y)
 
-#Entrenamos el pipeline con X y y
-#Esto hace todo el flujo completo, es decir, hace preprocesamiento, tf-idf y entrenamiento del modelo de Regresión Logística
-pipeline.fit(X, y)
+    #Guardaremos el modelo entrenado con joblib
+    #Configuramos la ruta para guardar el modelo entrenado en la carpeta models para que quede todo organizado
+    model_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'models', 'pipeline_ods_model_entrenado.joblib'))
+    #Guardamos el pipeline entrenado en la ruta especificada
+    joblib.dump(pipeline, model_path)
 
-#Guardaremos el modelo entrenado con joblib
-#Configuramos la ruta para guardar el modelo entrenado en la carpeta models para que quede todo organizado
-model_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'models', 'pipeline_ods_model_entrenado.joblib'))
-#Guardamos el pipeline entrenado en la ruta especificada
-joblib.dump(pipeline, model_path)
+    #Ahora el modelo ya está entrenado y guardado, listo para hacer predicciones en nuevos textos
+    #Esto quiere decir que el modelo del pipeline ya está listo para usarse (ya lo hemos entrenado y guardado)
 
-#Ahora el modelo ya está entrenado y guardado, listo para hacer predicciones en nuevos textos
-#Esto quiere decir que el modelo del pipeline ya está listo para usarse (ya lo hemos entrenado y guardado)
+    #Guardamos el dataset original de entrenamiento para poder reentrenar el modelo en el futuro si es necesario
+    entrenamiento_df = pd.DataFrame({'textos': X, 'labels': y})
+    entrenamiento_df.to_csv('data/training_data.csv', index=False)
 
-#Guardamos el dataset original de entrenamiento para poder reentrenar el modelo en el futuro si es necesario
-entrenamiento_df = pd.DataFrame({'textos': X, 'labels': y})
-entrenamiento_df.to_csv('data/training_data.csv', index=False)
+    #Quedo guardado como training_data.csv en la carpeta data
 
-#Quedo guardado como training_data.csv en la carpeta data
-
-muestras = ["La educación de calidad es clave para el desarrollo", 
-            "Necesitamos hospitales y vacunas para todos"]
-print(pipeline.predict(muestras))
+    muestras = ["La educación de calidad es clave para el desarrollo", 
+                "Necesitamos hospitales y vacunas para todos"]
+    print(pipeline.predict(muestras))
