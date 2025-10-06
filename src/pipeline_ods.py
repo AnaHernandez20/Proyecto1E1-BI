@@ -8,11 +8,15 @@ from sklearn.base import BaseEstimator, TransformerMixin
 import joblib
 import pandas as pd
 
-#Para no fallar al importar la función preprocesar_texto, probamos dos formas de importarla porque puede variar según desde dónde se ejecute el script
-try:
-    from .preprocesamiento import preprocesar_texto
-except ImportError:
-    from src.preprocesamiento import preprocesar_texto
+#Para poder importar desde la carpeta src (que está fuera de la carpeta src que es donde está este archivo pipeline_ods.py)
+import os, sys
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))      # .../Proyecto1E1-BI/src
+ROOT_DIR = os.path.abspath(os.path.join(BASE_DIR, '..'))   # .../Proyecto1E1-BI
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
+
+#Para no fallar al importar la función preprocesar_texto
+from src.preprocesamiento import preprocesar_texto
 
 
 #Le aplicamos el preprocesamiento a cada uno de los textos antes de hacerle tf-idf
@@ -72,7 +76,7 @@ df = pd.read_excel("data/Datos_proyecto.xlsx")
 X = df["textos"].astype(str).tolist() #Aqui estamos haciendo astype(str) para asegurarnos de que todos los textos sean strings
 y = df["labels"].tolist()
 
-entrenamiento_df = pd.DataFrame({'textos': X, 'Label': y})
+entrenamiento_df = pd.DataFrame({'textos': X, 'labels': y})
 
 #Creamos el pipeline
 pipeline = creacion_del_pipeline()
@@ -91,7 +95,7 @@ joblib.dump(pipeline, model_path)
 #Esto quiere decir que el modelo del pipeline ya está listo para usarse (ya lo hemos entrenado y guardado)
 
 #Guardamos el dataset original de entrenamiento para poder reentrenar el modelo en el futuro si es necesario
-entrenamiento_df = pd.DataFrame({'textos': X, 'Label': y})
+entrenamiento_df = pd.DataFrame({'textos': X, 'labels': y})
 entrenamiento_df.to_csv('data/training_data.csv', index=False)
 
 #Quedo guardado como training_data.csv en la carpeta data

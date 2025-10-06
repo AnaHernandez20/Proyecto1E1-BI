@@ -70,7 +70,7 @@ def entrenar_modelo(opiniones: OpinionEntrenamiento):
     modelo = cargar_modelo()
 
     #Convertimos los nuevos datos en DataFrame para estar ordenados
-    entrenamiento_df = pd.DataFrame({'textos': opiniones.textos, 'Label': opiniones.labels})
+    entrenamiento_df = pd.DataFrame({'textos': opiniones.textos, 'labels': opiniones.labels})
 
     #Separamos en X e y (opiniones o variable independiente e y la variable dependiente o etiqueta)
     #Hasta aqui estamos trabajando con los nuevos datos que nos llegaron para entrenar
@@ -84,13 +84,13 @@ def entrenar_modelo(opiniones: OpinionEntrenamiento):
         historico_actual = pd.read_csv(TRAIN_LOG_PATH)
         #Agregamos los datos historicos a los nuevos para tener todo el conjunto de entrenamiento
         X_total = historico_actual["textos"].astype(str).tolist() + X_nuevos
-        y_total = historico_actual["Label"].tolist() + y_nuevos
+        y_total = historico_actual["labels"].tolist() + y_nuevos
 
     #Entrenamos el modelo con todos los datos (los nuevos y los historicos)
     modelo.fit(X_total, y_total)
 
     #Vamos a guardar los nuevos datos en el CSV de datos historicos para no perderlos
-    df_nuevo = pd.DataFrame({"textos": X_nuevos, "Label": y_nuevos})
+    df_nuevo = pd.DataFrame({"textos": X_nuevos, "labels": y_nuevos})
     if os.path.exists(TRAIN_LOG_PATH):
         df_nuevo.to_csv(TRAIN_LOG_PATH, mode='a', header=False, index=False)
     else:
