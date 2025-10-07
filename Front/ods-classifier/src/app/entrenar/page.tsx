@@ -40,7 +40,7 @@ export default function EntrenarPage() {
       setIsLoading(true);
       setError(null);
       
-      // Simulamos progreso (en una implementación real, se usaría un websocket o polling)
+      // Simulamos progreso
       const progressInterval = setInterval(() => {
         setTrainingProgress((prev) => {
           if (prev === null) return 10;
@@ -75,12 +75,6 @@ export default function EntrenarPage() {
     }
   };
 
-  // Para mostrar la mejora en métricas en el resultado, creamos valores simulados para "antes"
-  const previousMetrics = {
-    precision: trainingResult ? (trainingResult.precision - (0.02 + Math.random() * 0.05)).toFixed(2) : "0.85",
-    recall: trainingResult ? (trainingResult.recall - (0.02 + Math.random() * 0.05)).toFixed(2) : "0.82",
-    f1_score: trainingResult ? (trainingResult.f1_score - (0.02 + Math.random() * 0.05)).toFixed(2) : "0.83",
-  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -91,7 +85,7 @@ export default function EntrenarPage() {
           <div className="mb-10 text-center">
             <h1 className="text-3xl font-bold text-gray-800 mb-2">Re-entrenamiento del Modelo</h1>
             <p className="text-gray-600">
-              Mejora la precisión del modelo re-entrenándolo con nuevos datos etiquetados. Suba un archivo Excel que contenga 
+              Actualiza el modelo con nuevos datos etiquetados. Suba un archivo Excel que contenga 
               textos y sus correspondientes etiquetas de ODS.
             </p>
           </div>
@@ -145,31 +139,27 @@ export default function EntrenarPage() {
                 <h2 className="text-lg font-semibold">Re-entrenamiento completado con éxito.</h2>
               </div>
               
-              <h3 className="text-md font-medium text-gray-700 mb-3">Nuevas métricas de rendimiento del modelo:</h3>
+              <h3 className="text-md font-medium text-gray-700 mb-3">Métricas de rendimiento del modelo:</h3>
               
               <div className="bg-gray-50 p-4 rounded-lg">
                 <table className="w-full text-left">
                   <thead className="border-b">
                     <tr className="text-gray-500">
                       <th className="py-2 pl-2">MÉTRICA</th>
-                      <th className="py-2">ANTES DEL RE-ENTRENAMIENTO</th>
-                      <th className="py-2">DESPUÉS DEL RE-ENTRENAMIENTO</th>
+                      <th className="py-2">VALOR</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y">
                     <tr>
                       <td className="py-3 pl-2 font-medium text-gray-800">Precisión</td>
-                      <td className="py-3 text-gray-800">{previousMetrics.precision}</td>
                       <td className="py-3 text-blue-600 font-medium">{trainingResult.precision.toFixed(2)}</td>
                     </tr>
                     <tr>
                       <td className="py-3 pl-2 font-medium text-gray-800">Recall</td>
-                      <td className="py-3 text-gray-800">{previousMetrics.recall}</td>
                       <td className="py-3 text-orange-500 font-medium">{trainingResult.recall.toFixed(2)}</td>
                     </tr>
                     <tr>
                       <td className="py-3 pl-2 font-medium text-gray-800">F1-Score</td>
-                      <td className="py-3 text-gray-800">{previousMetrics.f1_score}</td>
                       <td className="py-3 text-blue-600 font-medium">{trainingResult.f1_score.toFixed(2)}</td>
                     </tr>
                   </tbody>
