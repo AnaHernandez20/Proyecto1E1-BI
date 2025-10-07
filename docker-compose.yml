@@ -1,0 +1,14 @@
+version: "3.9"
+services:
+  ods-api:
+    image: ods-fastapi:0.1.1    #Nombre y version de la imagen que cree
+    container_name: ods-api
+    environment:
+      - ENV=prod
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
