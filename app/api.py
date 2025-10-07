@@ -1,5 +1,5 @@
 #Este archivo lo usamos para crear la API para la pagina web
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import pandas as pd
 from sklearn.metrics import precision_score, recall_score, f1_score
@@ -72,6 +72,12 @@ def predecir_opiniones(opiniones: OpinionesEntrada):
 def entrenar_modelo(opiniones: OpinionEntrenamiento):
     #Cargamos el modelo actual
     modelo = cargar_modelo()
+
+    #Hacemos algunas validaciones básicas para que no falle el entrenamiento por una mal entrada del usuario
+    if not opiniones.textos or not opiniones.labels:
+        raise HTTPException(status_code=422, detail="Se requieren textos y labels (tipos de ODS) no vacíos.")
+    if len(opiniones.textos) != len(opiniones.labels):
+        raise HTTPException(status_code=422, detail="textos y labels deben tener la misma longitud.")
 
     # Consolidar histórico + nuevos
 
