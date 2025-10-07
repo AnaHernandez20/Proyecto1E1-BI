@@ -40,7 +40,7 @@ export default function Home() {
             href="/entrenar"
             className="rounded-lg bg-orange-500 hover:bg-orange-600 transition-colors text-white font-medium text-sm sm:text-base h-10 sm:h-12 px-6 py-3 flex items-center justify-center min-w-64"
           >
-            Modo Experto: Re-entrenar Modelo
+            Re-entrenar Modelo
           </Link>
         </div>
       </main>
