@@ -7,6 +7,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.base import BaseEstimator, TransformerMixin
 import joblib
 import pandas as pd
+from sklearn.model_selection import train_test_split
 
 #Para poder importar desde la carpeta src (que está fuera de la carpeta src que es donde está este archivo pipeline_ods.py)
 import os, sys
@@ -66,21 +67,77 @@ def creacion_del_pipeline() -> Pipeline:
     ])
     return pipeline
 
+
+#Creamos un conjunto de validación simple para probar el entrenamiento
+def crear_conjunto_validacion(ROOT_DIR):
+    data_dir = os.path.join(ROOT_DIR, 'data')  #En la carpeta data
+    #Nos aseguramos de que la carpeta data exista
+    os.makedirs(data_dir, exist_ok=True)
+
+    #Rutas de los archivos
+    val_path  = os.path.join(data_dir, "val_set.csv")
+    train_path= os.path.join(data_dir, "training_data.csv")
+    datos_base_proyecto_xlsx = os.path.join(data_dir, "Datos_proyecto.xlsx")
+
+    #Si ya existe el conjunto de validación, no lo creamos de nuevo
+    if os.path.exists(val_path):
+        return
+
+    # Cargamos los datos de entrenamiento históricos si existen, sino cargamos los datos originales de la etapa 1 del proyecto
+    if os.path.exists(train_path):
+        df = pd.read_csv(train_path)
+    elif os.path.exists(datos_base_proyecto_xlsx):
+        df = pd.read_excel(datos_base_proyecto_xlsx)
+    else:
+        print("No se encontraron datos de entrenamiento.")
+        return
+
+    #Ahora nos aseguramos de que las columnas estén bien
+    df = df[['textos','labels']].dropna() #Que no haya valores nulos
+    df['textos'] = df['textos'].astype(str) #Asegurarnos de que todos los textos sean strings
+    df['labels'] = df['labels'].astype(int) #Asegurarnos de que todas las etiquetas sean enteros
+
+    #Ahora dividimos en conjunto de entrenamiento y validación
+    #Usamos stratify para que la proporción de clases en ambos conjuntos el 20% de validación mantennga las mismas proporciones de cada clase (ODS)
+    X_train, X_val, y_train, y_val = train_test_split(df['textos'], df['labels'], test_size=0.2, stratify=df['labels'], random_state=42)
+
+    #Guardamos el conjunto de validación en un CSV para usarlo después
+    validacion_df = pd.DataFrame({'textos': X_val, 'labels': y_val})
+    validacion_df.to_csv(val_path, index=False)
+
+    #Guardamos el conjunto de entrenamiento actualizado (80% de los datos originales) en un CSV para usarlo después
+    entrenamiento_df = pd.DataFrame({'textos': X_train, 'labels': y_train})
+    entrenamiento_df.to_csv(train_path, index=False)
+
+
 #Ahora si entrenamos el pipeline completo con los datos de la etapa 1 del proyecto
 #Ponemos main para que solo se ejecute si corremos este archivo directamente, y no si lo importamos desde otro archivo
 #Esto es para que no se ejecute el entrenamiento del modelo con los datos de la etapa 1 si solo queremos importar la función creacion_del_pipeline desde otro archivo para otros propósitos
 if __name__ == "__main__":
-    #Cargamos los datos de la etapa 1 del proyecto
-    #Recordemos que tienen las columnas: 'texto', 'etiqueta'
-    df = pd.read_excel("data/Datos_proyecto.xlsx")
+
+    #Nos aseguramos de crear el conjunto de validación si no existe
+    crear_conjunto_validacion(ROOT_DIR)
+
+    data_dir = os.path.join(ROOT_DIR, 'data')  #La carpeta data
+    #Nos aseguramos de que la carpeta data exista
+    os.makedirs(data_dir, exist_ok=True)
+    
+    #Rutas de los archivos
+    train_path= os.path.join(data_dir, "training_data.csv")
+    datos_base_proyecto_xlsx = os.path.join(data_dir, "Datos_proyecto.xlsx")
+
+    #Cargamos los datos de entrenamiento históricos si existen, sino cargamos los datos originales de la etapa 1 del proyecto
+    if os.path.exists(train_path):
+        df = pd.read_csv(train_path)
+    else:
+        df = pd.read_excel(datos_base_proyecto_xlsx)
+
 
     #Separemos en x y y que son las variables que usaremos para entrenar el modelo
     #X es la columna "texto" y y es la columna "etiqueta"
     X = df["textos"].astype(str).tolist() #Aqui estamos haciendo astype(str) para asegurarnos de que todos los textos sean strings
     y = df["labels"].tolist()
-
-    entrenamiento_df = pd.DataFrame({'textos': X, 'labels': y})
-
+    
     #Creamos el pipeline
     pipeline = creacion_del_pipeline()
 
@@ -97,9 +154,10 @@ if __name__ == "__main__":
     #Ahora el modelo ya está entrenado y guardado, listo para hacer predicciones en nuevos textos
     #Esto quiere decir que el modelo del pipeline ya está listo para usarse (ya lo hemos entrenado y guardado)
 
-    #Guardamos el dataset original de entrenamiento para poder reentrenar el modelo en el futuro si es necesario
-    entrenamiento_df = pd.DataFrame({'textos': X, 'labels': y})
-    entrenamiento_df.to_csv('data/training_data.csv', index=False)
+    #Guardamos el dataset de entrenamiento para poder reentrenar el modelo en el futuro si es necesario
+    if not os.path.exists(train_path):
+        os.makedirs(os.path.dirname(train_path), exist_ok=True)
+        df.to_csv(train_path, index=False)
 
     #Quedo guardado como training_data.csv en la carpeta data
 
