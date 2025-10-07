@@ -1,5 +1,6 @@
 #Este archivo lo usamos para crear la API para la pagina web
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import pandas as pd
 from sklearn.metrics import precision_score, recall_score, f1_score
@@ -26,6 +27,15 @@ VAL_PATH = os.path.abspath(os.path.join(ROOT_DIR, 'data', 'val_set.csv'))
 
 #Creamos la app de FastAPI que es la que va a manejar la API
 app = FastAPI()
+
+# Configurar CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Permitir cualquier origen (en producción, especificar los orígenes permitidos)
+    allow_credentials=True,
+    allow_methods=["*"],  # Permitir todos los métodos
+    allow_headers=["*"],  # Permitir todos los headers
+)
 
 #Definimos la estructura de los datos que vamos a recibir en la API
 #En este caso, una lista de uno o más textos (opiniones) para clasificar en ODS
