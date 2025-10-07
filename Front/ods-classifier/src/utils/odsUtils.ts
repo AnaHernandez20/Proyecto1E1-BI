@@ -9,10 +9,4 @@ export const mapODS: Record<number, { name: string; color: string }> = {
   5: { name: 'Igualdad de Género', color: 'bg-blue-600' },
 };
 
-/**
- * Genera colores aleatorios de confianza (entre 80% y 99%) para simular
- * el nivel de confianza de las predicciones
- */
-export const generateConfidence = () => {
-  return 0.80 + Math.random() * 0.19;
-};
+// Se eliminó la función generateConfidence que simulaba valores de confianza

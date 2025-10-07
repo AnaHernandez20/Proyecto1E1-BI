@@ -5,13 +5,12 @@ import { Navbar } from '../../components/Navbar';
 import { Button } from '../../components/Button';
 import { Card, ResultCard } from '../../components/Card';
 import { predecirODS } from '../../services/api';
-import { generateConfidence } from '../../utils/odsUtils';
 
 export default function ClasificarPage() {
   const [textos, setTextos] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
-  const [results, setResults] = useState<{ texto: string; ods: number; confianza: number }[]>([]);
-  const [allResults, setAllResults] = useState<{ texto: string; ods: number; confianza: number }[]>([]);
+  const [results, setResults] = useState<{ texto: string; ods: number }[]>([]);
+  const [allResults, setAllResults] = useState<{ texto: string; ods: number }[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -57,8 +56,7 @@ export default function ClasificarPage() {
       // Crear el array de resultados con los textos originales y sus predicciones
       const resultados = textosArray.map((texto, index) => ({
         texto,
-        ods: response.predicciones[index],
-        confianza: generateConfidence() // Simulamos la confianza ya que la API no la devuelve
+        ods: response.predicciones[index]
       }));
       
       // Actualizar los resultados actuales
@@ -128,8 +126,8 @@ export default function ClasificarPage() {
                   className="text-orange-500 hover:text-orange-600 flex items-center gap-2"
                   onClick={() => {
                     // Crear CSV y descargar
-                    const csv = ['Texto,ODS,Confianza']
-                      .concat(allResults.map(r => `"${r.texto.replace(/"/g, '""')}",${r.ods},${r.confianza.toFixed(2)}`))
+                    const csv = ['Texto,ODS']
+                      .concat(allResults.map(r => `"${r.texto.replace(/"/g, '""')}",${r.ods}`))
                       .join('\n');
                     
                     const blob = new Blob([csv], { type: 'text/csv' });
@@ -157,7 +155,6 @@ export default function ClasificarPage() {
                     key={index}
                     text={result.texto}
                     odsNumber={result.ods}
-                    confidence={result.confianza}
                   />
                 ))}
               </div>
