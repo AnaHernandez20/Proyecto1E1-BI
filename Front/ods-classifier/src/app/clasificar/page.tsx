@@ -126,7 +126,7 @@ export default function ClasificarPage() {
                   className="text-orange-500 hover:text-orange-600 flex items-center gap-2"
                   onClick={() => {
                     // Crear CSV y descargar
-                    const csv = ['Texto,ODS']
+                    const csv = ['textos,labels']
                       .concat(allResults.map(r => `"${r.texto.replace(/"/g, '""')}",${r.ods}`))
                       .join('\n');
                     
