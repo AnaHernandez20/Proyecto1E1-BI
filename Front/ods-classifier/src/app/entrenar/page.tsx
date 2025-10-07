@@ -158,18 +158,18 @@ export default function EntrenarPage() {
                   </thead>
                   <tbody className="divide-y">
                     <tr>
-                      <td className="py-3 pl-2 font-medium">Precisión</td>
-                      <td className="py-3">{previousMetrics.precision}</td>
+                      <td className="py-3 pl-2 font-medium text-gray-800">Precisión</td>
+                      <td className="py-3 text-gray-800">{previousMetrics.precision}</td>
                       <td className="py-3 text-blue-600 font-medium">{trainingResult.precision.toFixed(2)}</td>
                     </tr>
                     <tr>
-                      <td className="py-3 pl-2 font-medium">Recall</td>
-                      <td className="py-3">{previousMetrics.recall}</td>
+                      <td className="py-3 pl-2 font-medium text-gray-800">Recall</td>
+                      <td className="py-3 text-gray-800">{previousMetrics.recall}</td>
                       <td className="py-3 text-orange-500 font-medium">{trainingResult.recall.toFixed(2)}</td>
                     </tr>
                     <tr>
-                      <td className="py-3 pl-2 font-medium">F1-Score</td>
-                      <td className="py-3">{previousMetrics.f1_score}</td>
+                      <td className="py-3 pl-2 font-medium text-gray-800">F1-Score</td>
+                      <td className="py-3 text-gray-800">{previousMetrics.f1_score}</td>
                       <td className="py-3 text-blue-600 font-medium">{trainingResult.f1_score.toFixed(2)}</td>
                     </tr>
                   </tbody>
