@@ -1,0 +1,14 @@
+services:
+  api:
+    build: .
+    image: ods-api:1.0.0
+    container_name: ods-api
+    ports:
+      - "8000:8000"
+    environment:
+      ENV: prod
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

@@ -1,0 +1,21 @@
+#Para optimizar el contexto de construcción y reducir el tamaño de la imagen, se excluyen cachés, 
+#entornos virtuales, metadatos del control de versiones
+
+__pycache__/
+ *.pyc
+ *.pyo
+ *.pyd
+ *.sqlite3
+ *.db
+ .env
+ .venv/
+ .git/
+ .gitignore
+ README.md
+
+
+#El front
+Front/
+node_modules/
+package.json
+package-lock.json
