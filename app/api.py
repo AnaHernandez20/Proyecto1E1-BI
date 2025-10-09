@@ -20,10 +20,10 @@ from src.pipeline_ods import PreprocesamientoPersonalizado
 #Este acumulado de datos lo vamos a guardar en un CSV para no perderlo al reiniciar la app y poder seguir entrenando el modelo con nuevos datos
 #La ruta será dentro de la carpeta data que está en la raíz del proyecto
 #Esto lo usaremos en el endpoint /entrenar
-TRAIN_PATH = os.path.abspath(os.path.join(ROOT_DIR, 'data', 'training_data.csv'))
+TRAIN_PATH = os.path.join('data', 'training_data.csv')
 
 #Ahora la ruta de validacion
-VAL_PATH = os.path.abspath(os.path.join(ROOT_DIR, 'data', 'val_set.csv'))
+VAL_PATH = os.path.join('data', 'val_set.csv')
 
 #Creamos la app de FastAPI que es la que va a manejar la API
 app = FastAPI()
@@ -56,8 +56,24 @@ def cargar_modelo():
     global model
     #Si el modelo ya fue cargado, no lo tenemos que cargar de nuevo
     if model is None:
-        model_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'models', 'pipeline_ods_model_entrenado.joblib'))
-        model = joblib.load(model_path)
+        try:
+            # Intenta cargar el modelo desde la ruta relativa
+            model_path = os.path.join('models', 'pipeline_ods_model_entrenado.joblib')
+            print(f"Intentando cargar modelo desde: {os.path.abspath(model_path)}")
+            model = joblib.load(model_path)
+        except (FileNotFoundError, OSError) as e:
+            print(f"Error al cargar el modelo: {e}")
+            # Intenta cargar desde una ruta alternativa
+            try:
+                model_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'models', 'pipeline_ods_model_entrenado.joblib'))
+                print(f"Intentando ruta alternativa: {model_path}")
+                model = joblib.load(model_path)
+            except (FileNotFoundError, OSError) as e:
+                print(f"Error en ruta alternativa: {e}")
+                # Si no se puede cargar el modelo, crear uno básico usando el pipeline
+                from src.pipeline_ods import crear_pipeline
+                print("Creando un modelo básico con pipeline")
+                model = crear_pipeline()
     return model
 
 #Para que cuando entremos a la raiz de la API ("/") nos devuelva un mensaje de bienvenida y nos ubiquemos
@@ -162,7 +178,7 @@ def entrenar_modelo(opiniones: OpinionEntrenamiento):
 
 
     #Guardamos el modelo actualizado con joblib para no perder el entrenamiento que hicimos (llego nuevo conocimiento)
-    model_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'models', 'pipeline_ods_model_entrenado.joblib'))
+    model_path = os.path.join('models', 'pipeline_ods_model_entrenado.joblib')
     joblib.dump(modelo, model_path)
 
     #Devolvemos las metricas de evaluación en formato JSON para que la web las pueda interpretar
