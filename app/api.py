@@ -1,6 +1,7 @@
 #Este archivo lo usamos para crear la API para la pagina web
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from matplotlib.pylab import full
 from pydantic import BaseModel
 import pandas as pd
 from sklearn.metrics import precision_score, recall_score, f1_score
@@ -90,8 +91,34 @@ def predecir_opiniones(opiniones: OpinionesEntrada):
     modelo = cargar_modelo()
     #Realizamos predicción sobre todas las opiniones recibidas
     predicciones = modelo.predict(opiniones.textos)
+
+    #MODIFICACIÓN: Añadimos para que devuelva las probabilidades de cada clase
+    #Si el modelo de regresion logistica tiene el método predict_proba hecho por scikit-learn
+    #predict_proba() ya viene incluido en muchos modelos de scikit-learn, no lo tenemos que implementar nosotros
+    #este devuelve las probabilidades de pertenecer a cada clase
+
+    if hasattr(modelo, "predict_proba"):
+        proba = modelo.predict_proba(opiniones.textos)  #Aquí obtenemos las probabilidades de cada clase
+        scores = proba.max(axis=1).tolist()  #Aqui obtenemos la probabilidad máxima (score) para cada predicción
+
+        #Devolvemos las predicciones y los scores (proba mas alta) en formato JSON para que la web las pueda interpretar
+        respuesta = {
+            "predicciones": predicciones.tolist(),
+            "scores": scores
+        }
+        #Si queremos las probabilidades por TODAS clase, las añadimos también a la respuesta (lo dejo para que se decida en front)
+        #full es un parámetro opcional que se puede enviar en la petición para decidir si se quieren las probabilidades por clase
+        if full:
+            clases = modelo.classes_.tolist()
+            respuesta["probabilidades_por_clase"] = [
+                dict(zip(clases, fila.tolist())) for fila in proba
+            ]
+    else:
+        #Si el modelo no tiene predict_proba, devolvemos solo las predicciones sin scores (siempre lo tendra pero por si acaso)
+        respuesta = {"predicciones": predicciones.tolist(), "scores": None}
+
     #Devolvemos las predicciones como lista y en formato JSON para que la web las pueda interpretar
-    return {"predicciones": predicciones.tolist()}
+    return respuesta
 
 @app.post("/entrenar")
 #Endpoint para entrenar el modelo con nuevas opiniones y sus ODS (etiquetas)
