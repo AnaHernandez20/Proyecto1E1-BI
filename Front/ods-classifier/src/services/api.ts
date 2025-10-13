@@ -14,6 +14,8 @@ export interface PredecirRequest {
 
 export interface PredecirResponse {
   predicciones: number[];
+  scores: number[];
+  probabilidades_por_clase: Record<string, number>[];
 }
 
 export interface EntrenarRequest {

@@ -8,3 +8,5 @@ python-multipart
 nltk
 spacy
 num2words
+fastapi[all]
+matplotlib

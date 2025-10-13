@@ -9,8 +9,8 @@ import { predecirODS } from '../../services/api';
 export default function ClasificarPage() {
   const [textos, setTextos] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
-  const [results, setResults] = useState<{ texto: string; ods: number }[]>([]);
-  const [allResults, setAllResults] = useState<{ texto: string; ods: number }[]>([]);
+  const [results, setResults] = useState<{ texto: string; ods: number; score: number; probabilidades: Record<string, number> }[]>([]);
+  const [allResults, setAllResults] = useState<{ texto: string; ods: number; score: number; probabilidades: Record<string, number> }[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -56,7 +56,9 @@ export default function ClasificarPage() {
       // Crear el array de resultados con los textos originales y sus predicciones
       const resultados = textosArray.map((texto, index) => ({
         texto,
-        ods: response.predicciones[index]
+        ods: response.predicciones[index],
+        score: response.scores[index],
+        probabilidades: response.probabilidades_por_clase[index]
       }));
       
       // Actualizar los resultados actuales
@@ -116,7 +118,7 @@ export default function ClasificarPage() {
             </div>
           </form>
 
-          {/* Sección de resultados - Siempre visible si hay historial */}
+          {/* Sección de resultados*/}
           <div className="mt-12">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold text-gray-800">Historial de Análisis</h2>
@@ -126,8 +128,11 @@ export default function ClasificarPage() {
                   className="text-orange-500 hover:text-orange-600 flex items-center gap-2"
                   onClick={() => {
                     // Crear CSV y descargar
-                    const csv = ['textos,labels']
-                      .concat(allResults.map(r => `"${r.texto.replace(/"/g, '""')}",${r.ods}`))
+                    const csv = ['textos,labels,score,probabilidades']
+                      .concat(allResults.map(r => {
+                        const probsStr = JSON.stringify(r.probabilidades).replace(/"/g, '""');
+                        return `"${r.texto.replace(/"/g, '""')}",${r.ods},${r.score},"${probsStr}"`;
+                      }))
                       .join('\n');
                     
                     const blob = new Blob([csv], { type: 'text/csv' });
@@ -155,6 +160,8 @@ export default function ClasificarPage() {
                     key={index}
                     text={result.texto}
                     odsNumber={result.ods}
+                    confidence={result.score}
+                    allProbabilities={result.probabilidades}
                   />
                 ))}
               </div>
