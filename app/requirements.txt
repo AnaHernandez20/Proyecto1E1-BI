@@ -1,0 +1,12 @@
+fastapi
+uvicorn[standard]
+pandas
+scikit-learn
+joblib
+openpyxl
+python-multipart
+nltk
+spacy
+num2words
+fastapi[all]
+matplotlib
